@@ -115,32 +115,30 @@ class AGNet(nn.Module):
 
     def _make_head(self):
         return nn.Sequential(
-            nn.Conv2d(512, 256, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(True),
-            nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(True),
-            nn.Conv2d(256, 256, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
         )
 
     def forward(self, x):
         N = x.size(0)
         y = self.backbone(x)
+        y = F.avg_pool2d(y,5)
         # Age head
         y_age = self.age_head(y)
-        y_age = self.linear1(y_age.view(N, -1))
+        y_age = self.linear1(y_age.view(N,-1))
         # Gender head
         y_gender = self.gender_head(y)
-        y_gender = self.linear2(y_gender.view(N, -1))
+        y_gender = self.linear2(y_gender.view(N,-1))
         return y_age, y_gender.view(-1)
 
 
 def test():
     net = AGNet()
-    age, gender = net(Variable(torch.randn(2,3,224,224)))
+    age, gender = net(Variable(torch.randn(2,3,150,150)))
     print(age.size())
     print(gender.size())
 
 # test()
-
-
-print('44_Sin\xe8\x8c\x85ad_O\'Connor_0014.jpg')

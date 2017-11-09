@@ -31,7 +31,8 @@ start_epoch = 0  # start from epoch 0 or last epoch
 # Data
 print('==> Preparing data..')
 transform_train = transforms.Compose([
-    transforms.RandomSizedCrop(224),
+    transforms.CenterCrop(150),
+    transforms.RandomCrop(150, padding=4),
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
@@ -40,8 +41,7 @@ trainset = ListDataset(root='./images', list_file='./data/train.txt', transform=
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=8)
 
 transform_test = transforms.Compose([
-    transforms.Scale(256),
-    transforms.CenterCrop(224),
+    transforms.CenterCrop(150),
     transforms.ToTensor(),
     transforms.Normalize((0.485,0.456,0.406), (0.229,0.224,0.225))
 ])
@@ -68,7 +68,6 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=1
 def train(epoch):
     print('\nEpoch: %d' % epoch)
     net.train()
-    net.module.freeze_bn()
     train_loss = 0
     total = 0
     age_correct = 0
